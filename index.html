@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="color-scheme" content="light">
+<title>京都・滋賀エリア 運用モニター</title>
+<style>
+  :root{
+    --ink:#10151c;
+    --ink-2:#39424f;
+    --ink-3:#5a6675;
+    --paper:#eef1f4;
+    --panel:#ffffff;
+    --rule:#d3dae2;
+    --rule-strong:#aeb9c6;
+    --indigo:#16324f;
+    --indigo-2:#1f4470;
+    --indigo-deep:#0e1b2a;
+    --shu:#b62b22;
+    --shu-soft:#f0d4d1;
+    --moss:#1c5344;
+    --moss-soft:#d5e8e1;
+    --shadow:0 1px 0 rgba(16,21,28,.05), 0 8px 26px -18px rgba(16,21,28,.5);
+    --disp:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic Medium","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --sans:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Roboto Mono","Noto Sans Mono",monospace;
+    --serif:"Hiragino Mincho ProN","Yu Mincho",serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);color:var(--ink);
+    background:linear-gradient(rgba(22,50,79,.04) 1px,transparent 1px) 0 0/100% 28px,
+               linear-gradient(90deg,rgba(22,50,79,.04) 1px,transparent 1px) 0 0/28px 100%,
+               var(--paper);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    font-feature-settings:"palt" 1;overflow-x:hidden;
+  }
+  .num{font-variant-numeric:tabular-nums;font-family:var(--mono)}
+  button{-webkit-tap-highlight-color:rgba(182,43,34,.18)}
+
+  .app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+
+  /* ---------- rail ---------- */
+  .rail{background:linear-gradient(180deg,var(--indigo-deep),#0a1420);color:#eaf0f6;
+    padding:24px 18px 20px;display:flex;flex-direction:column;gap:22px;position:sticky;top:0;height:100vh}
+  .brand .mark{display:flex;align-items:center;gap:10px}
+  .brand .dot{width:11px;height:11px;background:var(--shu);border-radius:2px;transform:rotate(45deg)}
+  .brand .kicker{font-size:11px;letter-spacing:.2em;color:#b7c8da;text-transform:uppercase;font-weight:700}
+  .brand h1{font-family:var(--disp);font-size:20px;line-height:1.35;margin:8px 0 0;font-weight:800;letter-spacing:.02em;color:#fff}
+  .brand p{margin:6px 0 0;font-size:12.5px;color:#c3d1de;line-height:1.55}
+
+  .nav{display:flex;flex-direction:column;gap:7px}
+  .nav button{appearance:none;border:0;text-align:left;cursor:pointer;background:transparent;color:#d3dde8;
+    font-family:var(--sans);font-size:14px;font-weight:600;padding:12px 13px;border-radius:9px;display:flex;align-items:center;gap:11px;
+    border-left:3px solid transparent;transition:background .16s,color .16s,border-color .16s;min-height:46px}
+  .nav button .ix{font-family:var(--mono);font-size:11px;color:#a6bacd;width:20px;flex:0 0 auto}
+  .nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+  .nav button[aria-selected="true"]{background:rgba(182,43,34,.22);color:#fff;border-left-color:var(--shu)}
+  .nav button[aria-selected="true"] .ix{color:#f0a49e}
+  .nav button .sub{display:block;font-size:11.5px;color:#a9bccd;margin-top:3px;font-weight:500}
+  .nav button[aria-selected="true"] .sub{color:#f2c3bf}
+  .rail .meta{margin-top:auto;font-size:12px;color:#bccbda;line-height:1.75;border-top:1px solid rgba(255,255,255,.16);padding-top:13px}
+  .rail .meta b{color:#fff;font-weight:700}
+
+  /* ---------- main ---------- */
+  .main{padding:26px 30px 64px;min-width:0}
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:20px;flex-wrap:wrap}
+  .topbar .eyebrow{font-size:11.5px;letter-spacing:.2em;color:var(--indigo);text-transform:uppercase;margin-bottom:7px;font-weight:700}
+  .topbar h2{font-family:var(--disp);font-size:27px;margin:0;font-weight:800;letter-spacing:.02em;line-height:1.25}
+  .topbar .desc{margin:8px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.6;max-width:56ch}
+  .topbar .right{display:flex;align-items:center;gap:12px}
+  .btn{appearance:none;cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:700;
+    padding:11px 18px;border-radius:9px;border:1.5px solid var(--indigo);background:var(--indigo);color:#fff;
+    display:inline-flex;align-items:center;gap:8px;min-height:46px;transition:filter .15s,transform .05s}
+  .btn:hover{filter:brightness(1.14)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff;color:var(--indigo)}
+  .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .btn :focus-visible,.nav button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #7aa2c8;outline-offset:2px}
+  .seal{flex:0 0 auto;width:66px;height:66px;border:2.5px solid var(--shu);border-radius:6px;display:grid;
+    grid-template-columns:1fr 1fr;place-items:center;transform:rotate(-3deg);color:var(--shu);font-family:var(--serif);
+    font-size:21px;font-weight:700;line-height:1;box-shadow:0 6px 18px -12px rgba(182,43,34,.9);background:rgba(182,43,34,.05)}
+
+  .view{display:none;animation:rise .3s ease both}
+  .view.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:20px}
+  .kpi{background:var(--panel);border:1px solid var(--rule);border-radius:11px;padding:15px 17px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-width:0}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--indigo)}
+  .kpi.accent::before{background:var(--shu)}
+  .kpi.good::before{background:var(--moss)}
+  .kpi .lb{font-size:11.5px;letter-spacing:.06em;color:var(--ink-2);font-weight:700}
+  .kpi .vl{font-family:var(--disp);font-size:30px;font-weight:800;margin-top:6px;line-height:1.05;color:var(--ink);word-break:break-word}
+  .kpi .vl small{font-size:14px;font-weight:700;color:var(--ink-2);margin-left:3px}
+  .kpi .fn{font-size:12px;color:var(--ink-2);margin-top:7px;line-height:1.45;font-weight:500}
+  .kpi .fn b{color:var(--ink)}
+
+  .panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;min-width:0}
+  .panel .ph{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 17px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+  .panel .ph h3{font-family:var(--disp);font-size:16px;margin:0;font-weight:800;color:var(--ink)}
+  .panel .ph .desc{font-size:12.5px;color:var(--ink-2);margin-top:4px;font-weight:500}
+  .range{font-family:var(--mono);font-size:12px;color:var(--indigo);background:#e9f0f8;border:1px solid #cfdcec;padding:4px 9px;border-radius:6px;font-weight:600;white-space:nowrap}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .toolbar input,.toolbar select,.field select{font-family:var(--sans);font-size:14px;padding:10px 12px;border:1.5px solid var(--rule-strong);
+    border-radius:8px;background:#fff;color:var(--ink);min-height:44px;font-weight:600}
+  .field{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);font-weight:700}
+  .field select{min-width:150px}
+
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  thead th{text-align:left;font-weight:800;font-size:12px;letter-spacing:.04em;color:#33404e;background:#eef3f8;
+    border-bottom:2px solid var(--rule-strong);padding:11px 12px;white-space:nowrap;position:sticky;top:0;z-index:2}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:middle;color:var(--ink)}
+  tbody tr:hover{background:#f6f9fc}
+  tbody tr:last-child td{border-bottom:0}
+  td.r,th.r{text-align:right}
+  td.c,th.c{text-align:center}
+  .name{font-weight:700;color:var(--ink)}
+  .store-tag{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .code{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+
+  .bar{position:relative;height:10px;border-radius:6px;background:#e8edf2;min-width:80px;overflow:hidden}
+  .bar > span{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#d3776f,var(--shu));border-radius:6px}
+
+  .pill{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:20px;border:1.5px solid;font-weight:800}
+  .pill.warn{color:#8f1f18;border-color:#e6bcb8;background:#fcf0ef}
+  .pill.ok{color:var(--moss);border-color:#bcd9d0;background:#eff7f4}
+  .pill.mut{color:var(--ink-2);border-color:var(--rule-strong);background:#f3f6f9}
+
+  tfoot td{padding:11px 12px;border-top:2px solid var(--rule-strong);font-weight:800;background:#eef3f8;color:var(--ink)}
+  tfoot td.r,tfoot td.c{font-family:var(--mono)}
+
+  td.hm{text-align:center;font-family:var(--mono);font-weight:800;font-size:13px}
+  .hm0{color:#9aa6b4}
+  .zero-row td{color:#8b97a5}
+
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+  .split > *{min-width:0}
+
+  .li{list-style:none;margin:0;padding:2px 0}
+  .li li{padding:12px 2px 12px 26px;border-bottom:1px dashed var(--rule);position:relative;font-size:13.5px;line-height:1.65;color:var(--ink);font-weight:500}
+  .li li:last-child{border-bottom:0}
+  .li li::before{content:"";position:absolute;left:3px;top:18px;width:9px;height:9px;background:var(--shu);transform:rotate(45deg);border-radius:1px}
+  .li li.good::before{background:var(--moss)}
+  .li li em{font-style:normal;font-weight:800;color:#8f1f18}
+  .li li.good em{color:var(--moss)}
+  .li li b{font-weight:800;color:var(--ink)}
+
+  .catrow{display:grid;grid-template-columns:100px minmax(0,1fr) 62px 62px 54px;align-items:center;gap:12px;padding:10px 17px;border-bottom:1px solid var(--rule);font-size:13.5px}
+  .catrow:last-child{border-bottom:0}
+  .catrow.head{background:#eef3f8;font-size:11.5px;font-weight:800;color:#33404e;border-bottom:2px solid var(--rule-strong)}
+  .catrow .cn{font-weight:800;color:var(--ink)}
+  .dual{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .dual .b1,.dual .b2{height:9px;border-radius:5px;background:#e8edf2;position:relative;overflow:hidden}
+  .dual .b1 > span{position:absolute;inset:0 auto 0 0;background:var(--indigo-2)}
+  .dual .b2 > span{position:absolute;inset:0 auto 0 0;background:var(--shu)}
+  .catrow .v{text-align:right;font-family:var(--mono);font-size:13.5px;font-weight:700;color:var(--ink)}
+  .catrow .v small{display:block;font-family:var(--sans);font-size:10.5px;color:var(--ink-3);font-weight:700}
+  .delta{text-align:right;font-family:var(--mono);font-weight:800;font-size:13.5px}
+  .delta.up{color:#8f1f18}
+  .delta.down{color:var(--moss)}
+  .delta.flat{color:var(--ink-2)}
+
+  .note{font-size:12.5px;color:var(--ink-2);line-height:1.7;padding:14px 17px;background:#f5f8fb;border-top:1px solid var(--rule);font-weight:500}
+  .note b{color:var(--ink)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);padding:12px 17px;border-top:1px solid var(--rule);background:#fafcfe;font-weight:600}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .sw{width:13px;height:13px;border-radius:3px;flex:0 0 auto}
+
+  .print-head{display:none}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1080px){
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .split{grid-template-columns:minmax(0,1fr)}
+  }
+  @media (max-width:860px){
+    .app{grid-template-columns:minmax(0,1fr)}
+    .rail{position:static;height:auto;padding:18px 16px 14px;gap:14px}
+    .brand p{display:none}
+    .nav{flex-direction:row;overflow-x:auto;gap:8px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+    .nav button{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;border-radius:8px;padding:10px 13px}
+    .nav button[aria-selected="true"]{border-bottom-color:var(--shu)}
+    .nav button .sub{display:none}
+    .rail .meta{display:none}
+    .main{padding:18px 15px 60px}
+    .topbar h2{font-size:23px}
+    .seal{display:none}
+    .kpi .vl{font-size:26px}
+  }
+  @media (max-width:620px){
+    .kpis{grid-template-columns:minmax(0,1fr)}
+    .topbar{gap:12px}
+    .topbar .right{width:100%}
+    .btn{width:100%;justify-content:center}
+    /* 狭い画面では表を潰さず横スクロールさせる */
+    #view-chouka table{min-width:740px}
+    #fb-table{min-width:700px}
+    #fb-cmp{min-width:560px}
+    #an-stores{min-width:620px}
+    .field{width:100%;justify-content:space-between}
+    .field select{flex:1 1 auto;min-width:0}
+    .catrow{grid-template-columns:78px minmax(0,1fr) 42px 42px 44px;gap:7px;padding:9px 13px;font-size:13px}
+    .catrow.head{display:grid;font-size:10px;line-height:1.25;letter-spacing:0;padding-top:7px;padding-bottom:7px}
+    .catrow.head > div{white-space:normal}
+    .catrow.head .v,.catrow.head .delta{font-family:var(--sans);font-size:10px}
+    table{font-size:13px}
+    thead th,tbody td{padding:9px 10px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- print / PDF ---------- */
+  @media print{
+    @page{size:A4 landscape;margin:11mm}
+    html,body{background:#fff!important;overflow:visible}
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .rail,.toolbar,.no-print,.seal,#nav,.topbar .right{display:none!important}
+    .app{display:block}
+    .main{padding:0}
+    .view{display:none!important;animation:none}
+    .view.active{display:block!important}
+    .print-head{display:block;border-bottom:2.5px solid var(--indigo);padding-bottom:8px;margin-bottom:14px}
+    .print-head h1{font-family:var(--disp);font-size:19px;margin:0;font-weight:800}
+    .print-head .sub{font-size:11px;color:#33404e;margin-top:4px;font-weight:600}
+    .topbar{margin-bottom:12px}
+    .topbar h2{font-size:20px}
+    .topbar .desc{font-size:11px;max-width:none}
+    .kpis{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+    .kpi{box-shadow:none;border:1px solid #9aa6b4;padding:9px 11px}
+    .kpi .vl{font-size:20px}
+    .panel{box-shadow:none;border:1px solid #9aa6b4;margin-bottom:10px}
+    .panel .ph{padding:9px 11px}
+    .split{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+    .scroll{overflow:visible}
+    table{font-size:9.5px}
+    thead th{padding:6px 7px;font-size:9px;position:static}
+    tbody td{padding:5px 7px}
+    tfoot td{padding:6px 7px}
+    thead{display:table-header-group}
+    tr,.kpi,.panel,.catrow{break-inside:avoid;page-break-inside:avoid}
+    .catrow{padding:5px 11px;font-size:10px;grid-template-columns:70px minmax(0,1fr) 46px 46px 40px}
+    .note,.legend{font-size:9px;padding:7px 11px}
+    a{color:inherit;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark"><span class="dot"></span><span class="kicker">Operations Monitor</span></div>
+      <h1>京都・滋賀<br>エリア運用</h1>
+      <p>勤務超過とお客様のご意見を<br>ひとつの台帳で確認する</p>
+    </div>
+    <nav class="nav" id="nav" role="tablist" aria-label="表示切り替え">
+      <button data-view="chouka" aria-selected="true"><span class="ix">01</span><span>超過（時間外労働）<span class="sub">21名の超過状況</span></span></button>
+      <button data-view="feedback"><span class="ix">02</span><span>ご意見（月別）<span class="sub">月を選んで表示</span></span></button>
+      <button data-view="analysis"><span class="ix">03</span><span>分析レポート<span class="sub">2か月を比較</span></span></button>
+    </nav>
+    <div class="meta">
+      <div><b>出典</b> 対象スプレッドシート</div>
+      <div><b>シート</b> 超過 / ご意見</div>
+      <div><b>作成</b> 2026-10-04</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="print-head">
+      <h1>京都・滋賀エリア 運用モニター</h1>
+      <div class="sub" id="print-sub"></div>
+    </div>
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Kyoto / Shiga Area</div>
+        <h2 id="pg-title">超過（時間外労働）</h2>
+        <p class="desc" id="pg-desc">「超過」シートの店舗・従業員ごとの超過時間、超過回数、今後の労働時間を一覧します。</p>
+      </div>
+      <div class="right">
+        <button class="btn" id="pdf-btn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4-4m4 4l4-4"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+          PDF出力
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== 超過 ===== -->
+    <section class="view active" id="view-chouka">
+      <div class="kpis" id="ck-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>超過一覧</h3>
+            <div class="desc">列見出しをクリックすると並べ替えできます。氏名・店舗名で絞り込めます。</div>
+          </div>
+          <div class="toolbar no-print">
+            <input id="ck-search" type="search" placeholder="氏名・店舗名で検索" aria-label="氏名・店舗名で検索">
+            <select id="ck-sort" aria-label="並べ替え">
+              <option value="ov">超過時間が多い順</option>
+              <option value="ovAsc">超過時間が少ない順</option>
+              <option value="cnt">超過回数が多い順</option>
+              <option value="fut">今後の労働時間が多い順</option>
+              <option value="code">店舗№順</option>
+            </select>
+          </div>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-k="code">店舗№</th><th>店舗名</th><th data-k="emp">従業員番号</th><th data-k="name">氏名</th>
+                <th class="r" data-k="ov">超過時間</th><th>超過バー</th><th class="c" data-k="cntNum">超過回数</th><th class="r" data-k="fut">今後の労働時間</th>
+              </tr>
+            </thead>
+            <tbody id="ck-body"></tbody>
+          </table>
+        </div>
+        <div class="note">
+          超過時間・今後の労働時間は元シートの <b>[h]:mm</b> 表記をそのまま表示しています（<span class="num">79.0</span> は 79 時間）。「超過回数」は <b>実績/上限</b> の形式です。店舗名は「店舗」シートの店舗コード照合で補完しました。
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ご意見（月別） ===== -->
+    <section class="view" id="view-feedback">
+      <div class="kpis" id="fb-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>ご意見 集計表 <span id="fb-title-month"></span></h3>
+            <div class="desc">「ご意見」シートの月別集計を店舗×カテゴリで表示します。表示する月を選べます。</div>
+          </div>
+          <div class="toolbar no-print">
+            <label class="field">表示する月
+              <select id="fb-month" aria-label="表示する月"></select>
+            </label>
+            <span class="range" id="fb-range"></span>
+          </div>
+        </div>
+        <div class="scroll"><table id="fb-table"></table></div>
+        <div class="legend">
+          <span><span class="sw" style="background:rgba(31,68,112,.92)"></span>濃いほど件数が多い</span>
+          <span>『-』は分類なしの列です</span>
+          <span>合計0件の店舗は薄く表示</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>前月との比較</h3>
+            <div class="desc" id="fb-cmp-desc">選択した月と、その前月の件数を比較します。</div>
+          </div>
+          <span class="range" id="fb-cmp-range"></span>
+        </div>
+        <div id="fb-cats"></div>
+        <div class="scroll"><table id="fb-cmp"></table></div>
+        <div class="note" id="fb-cmp-note"></div>
+      </div>
+    </section>
+
+    <!-- ===== 分析 ===== -->
+    <section class="view" id="view-analysis">
+      <div class="kpis" id="an-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>比較条件</h3>
+            <div class="desc">対象月と比較月を選ぶと、下の指標がすべてその組み合わせで再計算されます。</div>
+          </div>
+          <div class="toolbar no-print">
+            <label class="field">対象月 <select id="an-target" aria-label="対象月"></select></label>
+            <label class="field">比較月 <select id="an-compare" aria-label="比較月"></select></label>
+          </div>
+        </div>
+      </div>
+      <div class="split" style="margin-bottom:20px">
+        <div class="panel" style="margin:0">
+          <div class="ph"><div><h3>カテゴリ別 件数比較</h3><div class="desc" id="an-catdesc"></div></div></div>
+          <div id="an-cats"></div>
+        </div>
+        <div class="panel" style="margin:0">
+          <div class="ph"><div><h3>読み取れるポイント</h3><div class="desc">選択した2か月の数値から自動でまとめた要約</div></div></div>
+          <ul class="li" id="an-points"></ul>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">
+          <div><h3>店舗別 件数と増減</h3><div class="desc" id="an-storedesc"></div></div>
+        </div>
+        <div class="scroll"><table id="an-stores"></table></div>
+        <div class="note" id="an-storenote"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const DATA = {
+ "generated": "2026-10-04",
+ "cats": [
+  "その他",
+  "飲食",
+  "料金",
+  "クレンリネス",
+  "機械",
+  "接客",
+  "-"
+ ],
+ "chouka": [
+  {
+   "code": 113,
+   "store": "山科駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000064167",
+   "name": "福田芽久",
+   "ovSec": 29400,
+   "ov": "8:10",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 248400,
+   "futH": 69.0
+  },
+  {
+   "code": 146,
+   "store": "京都駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "1766",
+   "name": "田嶋友裕",
+   "ovSec": 21960,
+   "ov": "6:06",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 273600,
+   "futH": 76.0
+  },
+  {
+   "code": 267,
+   "store": "Night Out 木屋町店",
+   "area": "京都・滋賀エリア",
+   "emp": "3000005505",
+   "name": "榊原来実",
+   "ovSec": 18900,
+   "ov": "5:15",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": null,
+   "futH": null
+  },
+  {
+   "code": 113,
+   "store": "山科駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2260",
+   "name": "佐伯奈々",
+   "ovSec": 16320,
+   "ov": "4:32",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 255600,
+   "futH": 71.0
+  },
+  {
+   "code": 228,
+   "store": "京大BOX店",
+   "area": "京都・滋賀エリア",
+   "emp": "2592",
+   "name": "牧野温子",
+   "ovSec": 16140,
+   "ov": "4:29",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 259200,
+   "futH": 72.0
+  },
+  {
+   "code": 73,
+   "store": "三条河原町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2449",
+   "name": "塚田直紀",
+   "ovSec": 15540,
+   "ov": "4:19",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 309600,
+   "futH": 86.0
+  },
+  {
+   "code": 255,
+   "store": "E-HUB KYOTO店",
+   "area": "京都・滋賀エリア",
+   "emp": "2796",
+   "name": "小島伊織",
+   "ovSec": 14100,
+   "ov": "3:55",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 262800,
+   "futH": 73.0
+  },
+  {
+   "code": 171,
+   "store": "草津駅東口店",
+   "area": "京都・滋賀エリア",
+   "emp": "2077",
+   "name": "松本生土",
+   "ovSec": 13260,
+   "ov": "3:41",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 234000,
+   "futH": 65.0
+  },
+  {
+   "code": 163,
+   "store": "六地蔵店",
+   "area": "京都・滋賀エリア",
+   "emp": "2534",
+   "name": "石田凌太",
+   "ovSec": 12900,
+   "ov": "3:35",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 313200,
+   "futH": 87.0
+  },
+  {
+   "code": 146,
+   "store": "京都駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2712",
+   "name": "得永琴乃",
+   "ovSec": 10500,
+   "ov": "2:55",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 316800,
+   "futH": 88.0
+  },
+  {
+   "code": 148,
+   "store": "同志社前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2302",
+   "name": "今川真達",
+   "ovSec": 10020,
+   "ov": "2:47",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 237600,
+   "futH": 66.0
+  },
+  {
+   "code": 228,
+   "store": "京大BOX店",
+   "area": "京都・滋賀エリア",
+   "emp": "2678",
+   "name": "野村陽翔",
+   "ovSec": 9480,
+   "ov": "2:38",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 284400,
+   "futH": 79.0
+  },
+  {
+   "code": 104,
+   "store": "河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1975",
+   "name": "直野泰晃",
+   "ovSec": 9180,
+   "ov": "2:33",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 284400,
+   "futH": 79.0
+  },
+  {
+   "code": 163,
+   "store": "六地蔵店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000021918",
+   "name": "伊田彩香",
+   "ovSec": 8640,
+   "ov": "2:24",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 237600,
+   "futH": 66.0
+  },
+  {
+   "code": 267,
+   "store": "Night Out 木屋町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2321",
+   "name": "明石凌",
+   "ovSec": 8520,
+   "ov": "2:22",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 230400,
+   "futH": 64.0
+  },
+  {
+   "code": 105,
+   "store": "SJK河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1302",
+   "name": "下坂正洋",
+   "ovSec": 4800,
+   "ov": "1:20",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 306000,
+   "futH": 85.0
+  },
+  {
+   "code": 205,
+   "store": "桃山御陵前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2763",
+   "name": "玉置亜莉珠",
+   "ovSec": 3660,
+   "ov": "1:01",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 349200,
+   "futH": 97.0
+  },
+  {
+   "code": 231,
+   "store": "石山駅直結店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000091020",
+   "name": "山家快斗",
+   "ovSec": 3600,
+   "ov": "1:00",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 356400,
+   "futH": 99.0
+  },
+  {
+   "code": 105,
+   "store": "SJK河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1619",
+   "name": "安井尚人",
+   "ovSec": 3000,
+   "ov": "0:50",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 248400,
+   "futH": 69.0
+  },
+  {
+   "code": 53,
+   "store": "四条河原町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2537",
+   "name": "松葉隆也",
+   "ovSec": 2940,
+   "ov": "0:49",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 234000,
+   "futH": 65.0
+  },
+  {
+   "code": 104,
+   "store": "河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "2536",
+   "name": "岡林生恵",
+   "ovSec": 900,
+   "ov": "0:15",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 288000,
+   "futH": 80.0
+  }
+ ],
+ "months": [
+  {
+   "key": "2026-09",
+   "label": "2026年9月",
+   "start": "2026/09/01",
+   "end": "2026/09/30",
+   "stores": [
+    {
+     "name": "洛北店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "四条河原町店",
+     "v": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "三条河原町店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "河原町本店",
+     "v": [
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "SJK河原町本店",
+     "v": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "山科駅前店",
+     "v": [
+      0,
+      0,
+      2,
+      0,
+      1,
+      0,
+      0
+     ],
+     "total": 3
+    },
+    {
+     "name": "京都駅前店",
+     "v": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "同志社前店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "六地蔵店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "草津駅東口店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "桃山御陵前店",
+     "v": [
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "京大BOX店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "石山駅直結店",
+     "v": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "京都河原町近江屋店",
+     "v": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "E-HUB KYOTO店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "Night Out 木屋町店",
+     "v": [
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+     ],
+     "total": 2
+    }
+   ],
+   "catTotals": [
+    2,
+    2,
+    6,
+    2,
+    4,
+    2,
+    0
+   ],
+   "grand": 18
+  },
+  {
+   "key": "2026-08",
+   "label": "2026年8月",
+   "start": "2026/08/01",
+   "end": "2026/08/31",
+   "stores": [
+    {
+     "name": "洛北店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "四条河原町店",
+     "v": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "三条河原町店",
+     "v": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "河原町本店",
+     "v": [
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1
+     ],
+     "total": 5
+    },
+    {
+     "name": "SJK河原町本店",
+     "v": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "山科駅前店",
+     "v": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "京都駅前店",
+     "v": [
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0
+     ],
+     "total": 3
+    },
+    {
+     "name": "同志社前店",
+     "v": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 1
+    },
+    {
+     "name": "六地蔵店",
+     "v": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "草津駅東口店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "桃山御陵前店",
+     "v": [
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      0
+     ],
+     "total": 3
+    },
+    {
+     "name": "京大BOX店",
+     "v": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 0
+    },
+    {
+     "name": "石山駅直結店",
+     "v": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0
+     ],
+     "total": 2
+    },
+    {
+     "name": "京都河原町近江屋店",
+     "v": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      2,
+      0
+     ],
+     "total": 3
+    },
+    {
+     "name": "E-HUB KYOTO店",
+     "v": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0
+     ],
+     "total": 3
+    },
+    {
+     "name": "Night Out 木屋町店",
+     "v": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      2,
+      0
+     ],
+     "total": 3
+    }
+   ],
+   "catTotals": [
+    4,
+    6,
+    5,
+    5,
+    3,
+    8,
+    1
+   ],
+   "grand": 32
+  }
+ ]
+};
+const CATS = DATA.cats;
+const MONTHS = DATA.months.slice().sort((a,b)=> a.key<b.key?1:-1);   // 新しい順
+const byKey = Object.fromEntries(MONTHS.map(m=>[m.key,m]));
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+const sum = a=>a.reduce((x,y)=>x+y,0);
+const esc = s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtSec = s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h+':'+String(m).padStart(2,'0');};
+const signed = n=>(n>0?'+':'')+n;
+function kpi(lb,vl,unit,fn,cls){return `<div class="kpi ${cls||''}"><div class="lb">${lb}</div><div class="vl">${vl}${unit?`<small>${unit}</small>`:''}</div><div class="fn">${fn||''}</div></div>`;}
+const hmColor=(n,max)=> !n ? 'transparent' : `rgba(31,68,112,${Math.max(.16,n/max*0.92).toFixed(3)})`;
+const hmText=n=> n? '#fff':'#9aa6b4';
+function prevMonth(key){                    // 直前の収録月（無ければ null）
+  const i = MONTHS.findIndex(m=>m.key===key);
+  return (i>=0 && i+1<MONTHS.length) ? MONTHS[i+1] : null;
+}
+function cmpLabel(){ return MONTHS.length<2 ? '比較できる月がまだありません' : ''; }
+
+/* ---------- tabs ---------- */
+const TITLES = {
+  chouka:['超過（時間外労働）','「超過」シートの店舗・従業員ごとの超過時間、超過回数、今後の労働時間を一覧します。'],
+  feedback:['ご意見（月別）','「ご意見」シートの月別集計を表示します。右上の「表示する月」で切り替えられます。'],
+  analysis:['分析レポート','対象月と比較月を選び、カテゴリ構成・店舗別の増減・読みどころを整理します。']
+};
+function currentViewKey(){ const b=$('#nav button[aria-selected="true"]'); return b?b.dataset.view:'chouka'; }
+function updatePrintSub(){
+  const v=currentViewKey(); let t=TITLES[v][0];
+  if(v==='feedback') t+='（'+(byKey[$('#fb-month').value]||{}).label+'）';
+  if(v==='analysis') t+='（'+(byKey[$('#an-target').value]||{}).label+' 対 '+(byKey[$('#an-compare').value]||{}).label+'）';
+  $('#print-sub').textContent = '出力日 2026-10-04／'+t;
+}
+function show(v){
+  document.querySelectorAll('#nav button').forEach(x=>x.setAttribute('aria-selected', String(x.dataset.view===v)));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active', s.id==='view-'+v));
+  $('#pg-title').textContent=TITLES[v][0];
+  $('#pg-desc').textContent=TITLES[v][1];
+  updatePrintSub();
+  window.scrollTo({top:0,behavior:'auto'});
+}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+
+/* ---------- PDF出力 ---------- */
+$('#pdf-btn').addEventListener('click', ()=>{ updatePrintSub(); window.print(); });
+
+/* ---------- 超過 ---------- */
+(function(){
+  const d=DATA.chouka;
+  const total=sum(d.map(x=>x.ovSec||0));
+  const maxRow=d.reduce((a,b)=>(b.ovSec||0)>(a.ovSec||0)?b:a,d[0]);
+  const futRows=d.filter(x=>x.futSec!=null);
+  const maxFut=futRows.reduce((a,b)=>b.futSec>a.futSec?b:a,futRows[0]);
+  $('#ck-kpis').innerHTML =
+    kpi('対象従業員', d.length, '名', '「超過」シートの対象者', '') +
+    kpi('超過時間 合計', (total/3600).toFixed(1), 'h', '全対象者の合計', 'accent') +
+    kpi('最大 超過時間', fmtSec(maxRow.ovSec), '', esc(maxRow.name)+'（'+esc(maxRow.store||'—')+'）', 'accent') +
+    kpi('今後の労働時間 最大', maxFut.futH.toFixed(1), 'h', esc(maxFut.name)+'（'+esc(maxFut.store||'—')+'）', '');
+
+  const body=$('#ck-body'), search=$('#ck-search'), sortSel=$('#ck-sort');
+  let sortKey='ov', dir=-1;
+  function apply(){
+    let rows=d.slice();
+    const q=search.value.trim().toLowerCase();
+    if(q) rows=rows.filter(x=>(x.name+' '+(x.store||'')+' '+x.emp).toLowerCase().includes(q));
+    rows.sort((a,b)=>{const av=a[sortKey],bv=b[sortKey];
+      if(typeof av==='string') return av.localeCompare(bv,'ja')*dir;
+      return ((av||0)-(bv||0))*dir;});
+    const max=Math.max(...rows.map(x=>x.ovSec||0),1);
+    body.innerHTML=rows.map(x=>`
+      <tr>
+        <td class="code">${x.code==null?'—':x.code}</td>
+        <td class="store-tag">${esc(x.store||'—')}</td>
+        <td class="code">${esc(x.emp)}</td>
+        <td class="name">${esc(x.name)}</td>
+        <td class="r num" style="font-weight:800;color:${x.ovSec>=21600?'#8f1f18':'inherit'}">${x.ov}</td>
+        <td><div class="bar"><span style="width:${((x.ovSec||0)/max*100).toFixed(1)}%"></span></div></td>
+        <td class="c"><span class="pill ${x.cntNum>0?'warn':'mut'}">${esc(x.cnt)}</span></td>
+        <td class="r num">${x.futH!=null?x.futH.toFixed(1)+' h':'—'}</td>
+      </tr>`).join('') || `<tr><td colspan="8" style="padding:26px;text-align:center;color:var(--ink-2)">該当する従業員がいません</td></tr>`;
+  }
+  search.addEventListener('input',apply);
+  sortSel.addEventListener('change',()=>{
+    const map={ov:['ov',-1],ovAsc:['ov',1],cnt:['cntNum',-1],fut:['futSec',-1],code:['code',1]};
+    sortKey=map[sortSel.value][0]; dir=map[sortSel.value][1]; apply();
+  });
+  apply();
+})();
+
+/* ---------- ご意見 ---------- */
+const fbMonth=$('#fb-month');
+fbMonth.innerHTML=MONTHS.map(m=>`<option value="${m.key}">${m.label}</option>`).join('');
+
+function renderFeedback(){
+  const m=byKey[fbMonth.value]; if(!m) return;
+  const maxCat=Math.max(...m.catTotals,1);
+  const maxCell=Math.max(...m.stores.flatMap(s=>s.v),1);
+  const top=bestStore(m), zero=m.stores.filter(s=>s.total===0);
+  $('#fb-title-month').textContent='— '+m.label;
+  $('#fb-range').textContent=m.start+' ～ '+m.end;
+  $('#fb-kpis').innerHTML=
+    kpi('総 ご意見 件数', m.grand, '件', '対象'+m.stores.length+'店舗の合計', 'accent')+
+    kpi('最多カテゴリ', CATS[m.catTotals.indexOf(maxCat)], '', '最多 '+maxCat+' 件', '')+
+    kpi('最多店舗', top.name, '', top.total+' 件', '')+
+    kpi('ご意見ゼロの店舗', zero.length, '店', '合計件数が0', zero.length?'good':'');
+
+  let h=`<thead><tr><th>店舗</th>${CATS.map(c=>`<th class="c">${esc(c)}</th>`).join('')}<th class="r">合計</th><th>構成</th></tr></thead><tbody>`;
+  const maxTotal=Math.max(...m.stores.map(s=>s.total),1);
+  m.stores.forEach(s=>{
+    h+=`<tr class="${s.total===0?'zero-row':''}"><td class="name">${esc(s.name)}</td>`+
+      s.v.map(n=>`<td class="hm" style="background:${hmColor(n,maxCell)};color:${hmText(n)}">${n||''}</td>`).join('')+
+      `<td class="r num" style="font-weight:800">${s.total}</td>`+
+      `<td><div class="bar"><span style="width:${(s.total/maxTotal*100).toFixed(1)}%"></span></div></td></tr>`;
+  });
+  h+=`</tbody><tfoot><tr><td>合計</td>${m.catTotals.map(n=>`<td class="r num">${n}</td>`).join('')}<td class="r num">${m.grand}</td><td></td></tr></tfoot>`;
+  $('#fb-table').innerHTML=h;
+
+  // 前月比較
+  const p=prevMonth(m.key);
+  if(!p){
+    $('#fb-cmp-desc').textContent='比較できる前月のデータが収録されていません。';
+    $('#fb-cmp-range').textContent='—';
+    $('#fb-cats').innerHTML='';
+    $('#fb-cmp').innerHTML='';
+    $('#fb-cmp-note').textContent='前月のデータを data.json に追加すると、ここに増減が表示されます。';
+    return;
+  }
+  $('#fb-cmp-desc').innerHTML=`<b>${p.label}</b> → <b>${m.label}</b> の増減`;
+  $('#fb-cmp-range').textContent=p.start+' ～ '+m.start;
+  renderCatCompare($('#fb-cats'), m, p);
+
+  const rows=m.stores.map(s=>{const ps=p.stores.find(x=>x.name===s.name); return {name:s.name, T:s.total, P:ps?ps.total:0};});
+  const maxSt=Math.max(...rows.map(r=>Math.max(r.T,r.P)),1);
+  $('#fb-cmp').innerHTML=
+    `<thead><tr><th>店舗</th><th class="c">${m.label}</th><th class="c">${p.label}</th><th class="c">増減</th><th class="r">合計</th><th>構成</th></tr></thead><tbody>`+
+    rows.map(r=>{const d=r.T-r.P;return `<tr class="${r.T+r.P===0?'zero-row':''}"><td class="name">${esc(r.name)}</td>`+
+      `<td class="c num">${r.T}</td><td class="c num">${r.P}</td>`+
+      `<td class="c delta ${d>0?'up':d<0?'down':'flat'}">${signed(d)}</td>`+
+      `<td class="r num" style="font-weight:800">${r.T+r.P}</td>`+
+      `<td><div class="dual"><div class="b1"><span style="width:${(r.T/maxSt*100).toFixed(1)}%"></span></div><div class="b2"><span style="width:${(r.P/maxSt*100).toFixed(1)}%"></span></div></div></td></tr>`;}).join('')+
+    `</tbody><tfoot><tr><td>合計</td><td class="c num">${m.grand}</td><td class="c num">${p.grand}</td>`+
+    `<td class="c delta ${m.grand-p.grand>0?'up':m.grand-p.grand<0?'down':'flat'}">${signed(m.grand-p.grand)}</td><td class="r num">${m.grand+p.grand}</td><td></td></tr></tfoot>`;
+  const d=m.grand-p.grand;
+  $('#fb-cmp-note').innerHTML=`総件数は <b>${p.label} ${p.grand}件 → ${m.label} ${m.grand}件</b>（${signed(d)}件）。上段のバーは <span style="color:var(--indigo);font-weight:800">■</span> ${m.label}、<span style="color:var(--shu);font-weight:800">■</span> ${p.label} を示します。`;
+}
+fbMonth.addEventListener('change',()=>{renderFeedback();updatePrintSub();});
+
+function bestStore(m){return m.stores.reduce((a,s)=>s.total>a.total?s:a,m.stores[0]);}
+function renderCatCompare(el, m, p){
+  const cmax=Math.max(...CATS.map((c,i)=>Math.max(m.catTotals[i],p.catTotals[i])),1);
+  const order=CATS.map((c,i)=>({c,i})).sort((x,y)=>(m.catTotals[y.i]+p.catTotals[y.i])-(m.catTotals[x.i]+p.catTotals[x.i]));
+  el.innerHTML=`<div class="catrow head"><div>カテゴリ</div><div>構成比</div><div class="v">対象</div><div class="v">比較</div><div class="delta">増減</div></div>`+
+    order.map(({c,i})=>{
+      const d=m.catTotals[i]-p.catTotals[i];
+      return `<div class="catrow"><div class="cn">${esc(c)}</div>
+        <div class="dual"><div class="b1"><span style="width:${(m.catTotals[i]/cmax*100).toFixed(1)}%"></span></div>
+        <div class="b2"><span style="width:${(p.catTotals[i]/cmax*100).toFixed(1)}%"></span></div></div>
+        <div class="v">${m.catTotals[i]}</div><div class="v">${p.catTotals[i]}</div>
+        <div class="delta ${d>0?'up':d<0?'down':'flat'}">${signed(d)}</div></div>`;}).join('');
+}
+
+/* ---------- 分析 ---------- */
+const anT=$('#an-target'), anC=$('#an-compare');
+anT.innerHTML=MONTHS.map(m=>`<option value="${m.key}">${m.label}</option>`).join('');
+anC.innerHTML=MONTHS.map(m=>`<option value="${m.key}">${m.label}</option>`).join('');
+if(MONTHS.length>=2){ anC.value=MONTHS[1].key; }
+function syncCompareOptions(){                     // 同一月は選べないように
+  [...anC.options].forEach(o=>o.disabled = (o.value===anT.value));
+  if(anC.value===anT.value){ const alt=MONTHS.find(m=>m.key!==anT.value); if(alt) anC.value=alt.key; }
+}
+function renderAnalysis(){
+  const T=byKey[anT.value], C=byKey[anC.value];
+  if(!T||!C){ $('#an-kpis').innerHTML=kpi('データ','—','','月のデータが不足しています',''); return; }
+  const d=T.grand-C.grand, rate=C.grand? (d/C.grand*100):0;
+  $('#an-kpis').innerHTML=
+    kpi('対象月 '+T.label, T.grand, '件', T.start+' ～ '+T.end, 'accent')+
+    kpi('比較月 '+C.label, C.grand, '件', C.start+' ～ '+C.end, '')+
+    kpi('増減（'+T.label+' − '+C.label+'）', signed(d), '件', (d>0?'増加 ':d<0?'減少 ':'変化なし ')+(C.grand?Math.abs(rate).toFixed(1)+'%':''), d<0?'good':'accent')+
+    kpi('最多カテゴリ（'+T.label+'）', CATS[T.catTotals.indexOf(Math.max(...T.catTotals))], '', '最多 '+Math.max(...T.catTotals)+' 件', '');
+  $('#an-catdesc').innerHTML=`<b>${T.label}</b>（藍）と <b>${C.label}</b>（朱）の対比。バーは2か月の最大値でスケール。`;
+  renderCatCompare($('#an-cats'), T, C);
+
+  // ポイント
+  const order=CATS.map((c,i)=>({c,i})).sort((x,y)=>(T.catTotals[y.i]+C.catTotals[y.i])-(T.catTotals[x.i]+C.catTotals[x.i]));
+  const up=order.filter(({i})=>T.catTotals[i]>C.catTotals[i]).map(({c,i})=>`${c} ${C.catTotals[i]}→${T.catTotals[i]}件`);
+  const down=order.filter(({i})=>T.catTotals[i]<C.catTotals[i]).map(({c,i})=>`${c} ${C.catTotals[i]}→${T.catTotals[i]}件`);
+  const rows=T.stores.map(s=>{const cs=C.stores.find(x=>x.name===s.name);return{name:s.name,T:s.total,P:cs?cs.total:0};});
+  const upS=rows.filter(r=>r.T>r.P).sort((a,b)=>(b.T-b.P)-(a.T-a.P));
+  const downS=rows.filter(r=>r.T<r.P).sort((a,b)=>(a.T-a.P)-(b.T-b.P));
+  const both=rows.filter(r=>r.T===0&&r.P===0);
+  const bT=bestStore(T), bC=bestStore(C);
+  const pts=[
+    `総件数は <em>${C.label} ${C.grand}件 → ${T.label} ${T.grand}件</em>（${signed(d)}件${C.grand? '、'+Math.abs(rate).toFixed(1)+'%':''}）。`,
+    down.length?`減少したカテゴリ: `+down.map(x=>(x.split(' ')[0])).join('・')+`（<em>${down.join('、')}</em>）。`:`カテゴリ別では減少した項目はありませんでした。`,
+    up.length?`増加したカテゴリ: `+up.map(x=>(x.split(' ')[0])).join('・')+`（<em>${up.join('、')}</em>）。`:`カテゴリ別では増加した項目はありませんでした。`,
+    `最多は ${T.label} が <em>${esc(bT.name)}</em> ${bT.total}件、${C.label} が <em>${esc(bC.name)}</em> ${bC.total}件。`,
+    upS.length?`前月より増えた店舗: <em>${upS.map(r=>esc(r.name)+' '+r.P+'→'+r.T).join('、')}</em>。`:'',
+    downS.length?`前月より減った店舗: <em>${downS.slice(0,6).map(r=>esc(r.name)+' '+r.P+'→'+r.T).join('、')}</em>${downS.length>6?' ほか':''}。`:'',
+    both.length?`両月ともご意見ゼロの店舗: <em>${both.map(r=>esc(r.name)).join('、')}</em>（継続して良好）。`:'全店舗でいずれかの月にご意見があります。'
+  ].filter(Boolean);
+  $('#an-points').innerHTML=pts.map((p,i)=>`<li class="${/減|ゼロ|減少/.test(p)&&i>0?'good':''}">${p}</li>`).join('');
+
+  // 店舗別
+  const sorted=rows.slice().sort((a,b)=>(b.T+b.P)-(a.T+a.P)||a.name.localeCompare(b.name,'ja'));
+  const maxSt=Math.max(...sorted.map(r=>Math.max(r.T,r.P)),1);
+  $('#an-storedesc').innerHTML=`<b>${T.label}</b>・<b>${C.label}</b> の合計件数と前月差。`;
+  $('#an-stores').innerHTML=
+    `<thead><tr><th>店舗</th><th class="c">${T.label}</th><th class="c">${C.label}</th><th class="c">増減</th><th class="r">合計</th><th>${T.label} / ${C.label}</th></tr></thead><tbody>`+
+    sorted.map(r=>{const dd=r.T-r.P;return `<tr class="${r.T+r.P===0?'zero-row':''}"><td class="name">${esc(r.name)}</td>`+
+      `<td class="c num">${r.T}</td><td class="c num">${r.P}</td>`+
+      `<td class="c delta ${dd>0?'up':dd<0?'down':'flat'}">${signed(dd)}</td>`+
+      `<td class="r num" style="font-weight:800">${r.T+r.P}</td>`+
+      `<td><div class="dual"><div class="b1"><span style="width:${(r.T/maxSt*100).toFixed(1)}%"></span></div><div class="b2"><span style="width:${(r.P/maxSt*100).toFixed(1)}%"></span></div></div></td></tr>`;}).join('')+
+    `</tbody><tfoot><tr><td>合計</td><td class="c num">${T.grand}</td><td class="c num">${C.grand}</td>`+
+    `<td class="c delta ${d>0?'up':d<0?'down':'flat'}">${signed(d)}</td><td class="r num">${T.grand+C.grand}</td><td></td></tr></tfoot>`;
+  $('#an-storenote').innerHTML=`増減の列は <b>${T.label} − ${C.label}</b>。増加（<span style="color:#8f1f18;font-weight:800">＋</span>）は対象月に増えた項目、減少（<span style="color:var(--moss);font-weight:800">−</span>）は減った項目を示します。`;
+}
+anT.addEventListener('change',()=>{syncCompareOptions();renderAnalysis();updatePrintSub();});
+anC.addEventListener('change',()=>{renderAnalysis();updatePrintSub();});
+
+/* ---------- init ---------- */
+if(byKey[fbMonth.value]) renderFeedback();
+syncCompareOptions();
+renderAnalysis();
+updatePrintSub();
+</script>
+</body>
+</html>
