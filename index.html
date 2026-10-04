@@ -1,0 +1,1236 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>京都・滋賀エリア 運用モニター</title>
+<style>
+  :root{
+    --ink:#141a22;
+    --ink-2:#3d4756;
+    --paper:#eef1f4;
+    --panel:#ffffff;
+    --rule:#d5dbe3;
+    --rule-strong:#b7c0cc;
+    --indigo:#1f3a5f;
+    --indigo-deep:#16293f;
+    --shu:#c2322a;
+    --shu-soft:#f2d9d6;
+    --moss:#2f6f5e;
+    --amber:#a8701a;
+    --shadow:0 1px 0 rgba(20,26,34,.05), 0 8px 28px -18px rgba(20,26,34,.45);
+    --serif:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP",serif;
+    --sans:"Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Noto Sans CJK JP",system-ui,sans-serif;
+    --mono:ui-monospace,"SFMono-Regular",Menlo,"Roboto Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      linear-gradient(rgba(31,58,95,.035) 1px,transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg,rgba(31,58,95,.035) 1px,transparent 1px) 0 0/28px 100%,
+      var(--paper);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"palt" 1;
+  }
+  .num{font-variant-numeric:tabular-nums;font-family:var(--mono)}
+
+  .app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+
+  /* ---------- rail ---------- */
+  .rail{
+    background:linear-gradient(180deg,var(--indigo-deep),#101d2c);
+    color:#e9eef4;padding:26px 20px 22px;display:flex;flex-direction:column;gap:26px;
+    position:sticky;top:0;height:100vh;
+  }
+  .brand{display:flex;flex-direction:column;gap:6px}
+  .brand .mark{display:flex;align-items:center;gap:10px}
+  .brand .dot{width:10px;height:10px;background:var(--shu);border-radius:2px;transform:rotate(45deg)}
+  .brand .kicker{font-size:11px;letter-spacing:.22em;color:#8fa3bb;text-transform:uppercase}
+  .brand h1{font-family:var(--serif);font-size:20px;line-height:1.35;margin:2px 0 0;font-weight:600;letter-spacing:.02em}
+  .brand p{margin:4px 0 0;font-size:12px;color:#9db0c6;line-height:1.5}
+
+  .nav{display:flex;flex-direction:column;gap:8px}
+  .nav button{
+    appearance:none;border:0;text-align:left;cursor:pointer;
+    background:transparent;color:#c3d0de;font-family:var(--sans);font-size:14px;
+    padding:12px 14px;border-radius:8px;display:flex;align-items:center;gap:12px;
+    border-left:3px solid transparent;transition:background .18s,color .18s,border-color .18s;
+  }
+  .nav button .ix{font-family:var(--mono);font-size:11px;color:#7d93ac;width:22px}
+  .nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav button[aria-selected="true"]{background:rgba(194,50,42,.16);color:#fff;border-left-color:var(--shu)}
+  .nav button[aria-selected="true"] .ix{color:var(--shu)}
+  .nav button .sub{display:block;font-size:11px;color:#8095ad;margin-top:2px}
+  .nav button[aria-selected="true"] .sub{color:#d9a7a3}
+
+  .rail .meta{margin-top:auto;font-size:11px;color:#7f94ab;line-height:1.7;border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
+  .rail .meta b{color:#c3d0de;font-weight:600}
+
+  /* ---------- main ---------- */
+  .main{padding:30px 34px 60px;min-width:0}
+  .topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+  .topbar .title h2{font-family:var(--serif);font-size:27px;margin:0;font-weight:600;letter-spacing:.03em}
+  .topbar .title .eyebrow{font-size:11px;letter-spacing:.24em;color:var(--indigo);text-transform:uppercase;margin-bottom:7px}
+  .topbar .title p{margin:7px 0 0;color:var(--ink-2);font-size:13px;line-height:1.6}
+  .seal{
+    flex:0 0 auto;width:76px;height:76px;border:2.5px solid var(--shu);border-radius:6px;
+    display:grid;grid-template-columns:1fr 1fr;place-items:center;transform:rotate(-3deg);
+    color:var(--shu);font-family:var(--serif);font-size:24px;font-weight:600;line-height:1;
+    box-shadow:0 6px 20px -12px rgba(194,50,42,.9);background:rgba(194,50,42,.04);
+  }
+
+  .view{display:none;animation:rise .34s ease both}
+  .view.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* kpi strip */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+  .kpi{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--indigo)}
+  .kpi.accent::before{background:var(--shu)}
+  .kpi .lb{font-size:11px;letter-spacing:.1em;color:var(--ink-2);text-transform:uppercase}
+  .kpi .vl{font-family:var(--serif);font-size:30px;font-weight:600;margin-top:7px;line-height:1}
+  .kpi .vl small{font-size:14px;font-family:var(--sans);color:var(--ink-2);margin-left:4px}
+  .kpi .fn{font-size:11.5px;color:var(--ink-2);margin-top:7px}
+
+  /* panel */
+  .panel{background:var(--panel);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px}
+  .panel .ph{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+  .panel .ph h3{font-family:var(--serif);font-size:16px;margin:0;font-weight:600}
+  .panel .ph .desc{font-size:12px;color:var(--ink-2);margin-top:3px}
+  .panel .ph .range{font-family:var(--mono);font-size:11px;color:var(--indigo);background:#eef3f9;border:1px solid #dbe5f0;padding:3px 8px;border-radius:5px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .toolbar input,.toolbar select{
+    font-family:var(--sans);font-size:13px;padding:8px 11px;border:1px solid var(--rule-strong);
+    border-radius:7px;background:#fbfcfd;color:var(--ink);min-width:150px;
+  }
+  .toolbar input:focus,.toolbar select:focus{outline:2px solid var(--indigo);outline-offset:1px}
+
+  /* tables */
+  .scroll{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  thead th{
+    text-align:left;font-weight:600;font-size:11.5px;letter-spacing:.06em;color:#4a5666;
+    background:#f4f7fa;border-bottom:1.5px solid var(--rule-strong);padding:10px 12px;white-space:nowrap;
+    position:sticky;top:0;z-index:2;
+  }
+  thead th.sortable{cursor:pointer;user-select:none}
+  thead th.sortable:hover{color:var(--indigo)}
+  thead th .ar{font-size:9px;margin-left:5px;color:var(--indigo)}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
+  tbody tr:hover{background:#f8fafc}
+  tbody tr:last-child td{border-bottom:0}
+  td.r,th.r{text-align:right}
+  td.c,th.c{text-align:center}
+  .name{font-weight:600;color:var(--ink)}
+  .store-tag{font-size:11px;color:var(--ink-2)}
+  .code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+
+  .bar{position:relative;height:9px;border-radius:5px;background:#eef1f5;min-width:90px;overflow:hidden}
+  .bar > span{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#d8756e,var(--shu));border-radius:5px}
+
+  .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid}
+  .pill.warn{color:var(--shu);border-color:var(--shu-soft);background:#fdf2f1}
+  .pill.ok{color:var(--moss);border-color:#cfe5dd;background:#f1f8f5}
+  .pill.mut{color:var(--ink-2);border-color:var(--rule);background:#f6f8fa}
+
+  tfoot td{padding:11px 12px;border-top:2px solid var(--rule-strong);font-weight:700;background:#f4f7fa}
+  tfoot td.r{font-family:var(--mono)}
+
+  /* heatmap */
+  td.hm{text-align:center;font-family:var(--mono);font-weight:600;position:relative}
+  .hm0{color:#b9c2cd}
+  .zero-row{color:#9aa5b1}
+
+  /* analysis */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .li{list-style:none;margin:0;padding:0}
+  .li li{padding:11px 0 11px 26px;border-bottom:1px dashed var(--rule);position:relative;font-size:13.5px;line-height:1.6}
+  .li li:last-child{border-bottom:0}
+  .li li::before{content:"";position:absolute;left:4px;top:18px;width:8px;height:8px;background:var(--shu);transform:rotate(45deg);border-radius:1px}
+  .li li.good::before{background:var(--moss)}
+  .li li em{font-style:normal;font-family:var(--mono);color:var(--shu);font-weight:600}
+  .li li.good em{color:var(--moss)}
+
+  .catrow{display:grid;grid-template-columns:120px 1fr 92px 92px 76px;align-items:center;gap:12px;padding:9px 18px;border-bottom:1px solid var(--rule);font-size:13px}
+  .catrow:last-child{border-bottom:0}
+  .catrow .cn{font-weight:600}
+  .dual{display:flex;flex-direction:column;gap:4px}
+  .dual .b1,.dual .b2{height:7px;border-radius:4px;background:#eef1f5;position:relative;overflow:hidden}
+  .dual .b1 > span{position:absolute;inset:0 auto 0 0;background:var(--indigo)}
+  .dual .b2 > span{position:absolute;inset:0 auto 0 0;background:var(--shu)}
+  .catrow .v{text-align:right;font-family:var(--mono);font-size:13px}
+  .delta{text-align:right;font-family:var(--mono);font-weight:700;font-size:13px}
+  .delta.up{color:var(--shu)}
+  .delta.down{color:var(--moss)}
+  .delta.flat{color:var(--ink-2)}
+
+  .note{font-size:12px;color:var(--ink-2);line-height:1.6;padding:14px 18px;background:#f7f9fb;border-top:1px solid var(--rule)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);padding:11px 18px;border-top:1px solid var(--rule);background:#fbfcfd}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .sw{width:12px;height:12px;border-radius:3px}
+
+  @media (max-width:1000px){
+    .app{grid-template-columns:1fr}
+    .rail{position:static;height:auto;flex-direction:column;gap:18px}
+    .nav{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+    .nav button{white-space:nowrap;border-left:0;border-bottom:3px solid transparent}
+    .nav button[aria-selected="true"]{border-bottom-color:var(--shu)}
+    .kpis{grid-template-columns:1fr 1fr}
+    .split{grid-template-columns:1fr}
+    .main{padding:22px 16px 50px}
+  }
+  @media (max-width:560px){.kpis{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark"><span class="dot"></span><span class="kicker">Operations Monitor</span></div>
+      <h1>京都・滋賀<br>エリア運用</h1>
+      <p>勤務超過とお客様のご意見を<br>ひとつの台帳で確認する</p>
+    </div>
+    <nav class="nav" id="nav" role="tablist">
+      <button data-view="chouka" aria-selected="true"><span class="ix">01</span><span>超過（時間外労働）<span class="sub">21名の超過状況</span></span></button>
+      <button data-view="sep"><span class="ix">02</span><span>ご意見 9月<span class="sub">2026/09/01 – 09/30</span></span></button>
+      <button data-view="aug"><span class="ix">03</span><span>ご意見 8月<span class="sub">2026/08/01 – 08/31</span></span></button>
+      <button data-view="analysis"><span class="ix">04</span><span>分析レポート<span class="sub">9月 と 8月 の比較</span></span></button>
+    </nav>
+    <div class="meta">
+      <div><b>出典</b> 対象スプレッドシート</div>
+      <div><b>シート</b> 超過 / ご意見</div>
+      <div><b>作成</b> 2026-10-04</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="title">
+        <div class="eyebrow">Kyoto / Shiga Area</div>
+        <h2 id="pg-title">超過（時間外労働）</h2>
+        <p id="pg-desc">「超過」シートに記録された店舗・従業員ごとの超過時間、超過回数、今後の労働時間を一覧します。</p>
+      </div>
+      <div class="seal" aria-hidden="true"><span>京</span><span>都</span><span>滋</span><span>賀</span></div>
+    </header>
+
+    <!-- ===== 超過 ===== -->
+    <section class="view active" id="view-chouka">
+      <div class="kpis" id="ck-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>超過一覧</h3>
+            <div class="desc">列見出しをクリックすると並べ替えできます。氏名・店舗名で絞り込めます。</div>
+          </div>
+          <div class="toolbar">
+            <input id="ck-search" type="search" placeholder="氏名・店舗名で検索">
+            <select id="ck-sort">
+              <option value="ov">超過時間が多い順</option>
+              <option value="ovAsc">超過時間が少ない順</option>
+              <option value="cnt">超過回数が多い順</option>
+              <option value="fut">今後の労働時間が多い順</option>
+              <option value="code">店舗№順</option>
+            </select>
+          </div>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th class="sortable" data-k="code">店舗№<span class="ar"></span></th>
+                <th>店舗名</th>
+                <th class="sortable" data-k="emp">従業員番号<span class="ar"></span></th>
+                <th class="sortable" data-k="name">氏名<span class="ar"></span></th>
+                <th class="sortable r" data-k="ov">超過時間<span class="ar"></span></th>
+                <th style="width:150px">超過バー</th>
+                <th class="sortable c" data-k="cntNum">超過回数<span class="ar"></span></th>
+                <th class="sortable r" data-k="fut">今後の労働時間<span class="ar"></span></th>
+              </tr>
+            </thead>
+            <tbody id="ck-body"></tbody>
+          </table>
+        </div>
+        <div class="note">
+          超過時間・今後の労働時間は元シートの「[h]:mm」表記をそのまま表示しています（<span class="num">79.0</span> は 79 時間）。「超過回数」は <span class="num">実績/上限</span> の形式です。店舗名は「店舗」シートの店舗コード照合で補完しました。
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ご意見 9月 ===== -->
+    <section class="view" id="view-sep">
+      <div class="kpis" id="sep-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>ご意見 集計表 — 2026年9月</h3>
+            <div class="desc">ご意見シート <span class="range">AG3:AN23</span> の範囲をそのまま表示</div>
+          </div>
+          <div class="range" id="sep-range"></div>
+        </div>
+        <div class="scroll"><table id="sep-table"></table></div>
+        <div class="legend" id="sep-legend"></div>
+      </div>
+    </section>
+
+    <!-- ===== ご意見 8月 ===== -->
+    <section class="view" id="view-aug">
+      <div class="kpis" id="aug-kpis"></div>
+      <div class="panel">
+        <div class="ph">
+          <div>
+            <h3>ご意見 集計表 — 2026年8月</h3>
+            <div class="desc">ご意見シート <span class="range">AG24:AN46</span> の範囲をそのまま表示</div>
+          </div>
+          <div class="range" id="aug-range"></div>
+        </div>
+        <div class="scroll"><table id="aug-table"></table></div>
+        <div class="legend" id="aug-legend"></div>
+      </div>
+    </section>
+
+    <!-- ===== 分析 ===== -->
+    <section class="view" id="view-analysis">
+      <div class="kpis" id="an-kpis"></div>
+      <div class="split" style="margin-bottom:22px">
+        <div class="panel" style="margin:0">
+          <div class="ph"><div><h3>カテゴリ別 件数比較</h3><div class="desc">9月（藍）と 8月（朱）の対比。バーは各月の最大値でスケール。</div></div></div>
+          <div id="an-cats"></div>
+        </div>
+        <div class="panel" style="margin:0">
+          <div class="ph"><div><h3>読み取れるポイント</h3><div class="desc">2範囲の数値から自動でまとめた要約</div></div></div>
+          <ul class="li" id="an-points"></ul>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">
+          <div><h3>店舗別 件数と増減</h3><div class="desc">9月・8月の合計件数と前月差（8月 → 9月）</div></div>
+        </div>
+        <div class="scroll"><table id="an-stores"></table></div>
+        <div class="note">差の列は「9月 − 8月」。増加（<span style="color:var(--shu);font-weight:600">＋</span>）は9月に増えた項目、減少（<span style="color:var(--moss);font-weight:600">−</span>）は減った項目を示します。</div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const DATA = {
+ "cats": [
+  "その他",
+  "飲食",
+  "料金",
+  "クレンリネス",
+  "機械",
+  "接客",
+  "-"
+ ],
+ "chouka": [
+  {
+   "code": 113,
+   "store": "山科駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000064167",
+   "name": "福田芽久",
+   "ovSec": 29400,
+   "ov": "8:10",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 248400,
+   "futH": 69.0
+  },
+  {
+   "code": 146,
+   "store": "京都駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "1766",
+   "name": "田嶋友裕",
+   "ovSec": 21960,
+   "ov": "6:06",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 273600,
+   "futH": 76.0
+  },
+  {
+   "code": 267,
+   "store": "Night Out 木屋町店",
+   "area": "京都・滋賀エリア",
+   "emp": "3000005505",
+   "name": "榊原来実",
+   "ovSec": 18900,
+   "ov": "5:15",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": null,
+   "futH": null
+  },
+  {
+   "code": 113,
+   "store": "山科駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2260",
+   "name": "佐伯奈々",
+   "ovSec": 16320,
+   "ov": "4:32",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 255600,
+   "futH": 71.0
+  },
+  {
+   "code": 228,
+   "store": "京大BOX店",
+   "area": "京都・滋賀エリア",
+   "emp": "2592",
+   "name": "牧野温子",
+   "ovSec": 16140,
+   "ov": "4:29",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 259200,
+   "futH": 72.0
+  },
+  {
+   "code": 73,
+   "store": "三条河原町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2449",
+   "name": "塚田直紀",
+   "ovSec": 15540,
+   "ov": "4:19",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 309600,
+   "futH": 86.0
+  },
+  {
+   "code": 255,
+   "store": "E-HUB KYOTO店",
+   "area": "京都・滋賀エリア",
+   "emp": "2796",
+   "name": "小島伊織",
+   "ovSec": 14100,
+   "ov": "3:55",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 262800,
+   "futH": 73.0
+  },
+  {
+   "code": 171,
+   "store": "草津駅東口店",
+   "area": "京都・滋賀エリア",
+   "emp": "2077",
+   "name": "松本生土",
+   "ovSec": 13260,
+   "ov": "3:41",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 234000,
+   "futH": 65.0
+  },
+  {
+   "code": 163,
+   "store": "六地蔵店",
+   "area": "京都・滋賀エリア",
+   "emp": "2534",
+   "name": "石田凌太",
+   "ovSec": 12900,
+   "ov": "3:35",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 313200,
+   "futH": 87.0
+  },
+  {
+   "code": 146,
+   "store": "京都駅前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2712",
+   "name": "得永琴乃",
+   "ovSec": 10500,
+   "ov": "2:55",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 316800,
+   "futH": 88.0
+  },
+  {
+   "code": 148,
+   "store": "同志社前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2302",
+   "name": "今川真達",
+   "ovSec": 10020,
+   "ov": "2:47",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 237600,
+   "futH": 66.0
+  },
+  {
+   "code": 228,
+   "store": "京大BOX店",
+   "area": "京都・滋賀エリア",
+   "emp": "2678",
+   "name": "野村陽翔",
+   "ovSec": 9480,
+   "ov": "2:38",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 284400,
+   "futH": 79.0
+  },
+  {
+   "code": 104,
+   "store": "河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1975",
+   "name": "直野泰晃",
+   "ovSec": 9180,
+   "ov": "2:33",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 284400,
+   "futH": 79.0
+  },
+  {
+   "code": 163,
+   "store": "六地蔵店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000021918",
+   "name": "伊田彩香",
+   "ovSec": 8640,
+   "ov": "2:24",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 237600,
+   "futH": 66.0
+  },
+  {
+   "code": 267,
+   "store": "Night Out 木屋町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2321",
+   "name": "明石凌",
+   "ovSec": 8520,
+   "ov": "2:22",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 230400,
+   "futH": 64.0
+  },
+  {
+   "code": 105,
+   "store": "SJK河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1302",
+   "name": "下坂正洋",
+   "ovSec": 4800,
+   "ov": "1:20",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 306000,
+   "futH": 85.0
+  },
+  {
+   "code": 205,
+   "store": "桃山御陵前店",
+   "area": "京都・滋賀エリア",
+   "emp": "2763",
+   "name": "玉置亜莉珠",
+   "ovSec": 3660,
+   "ov": "1:01",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 349200,
+   "futH": 97.0
+  },
+  {
+   "code": 231,
+   "store": "石山駅直結店",
+   "area": "京都・滋賀エリア",
+   "emp": "2000091020",
+   "name": "山家快斗",
+   "ovSec": 3600,
+   "ov": "1:00",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 356400,
+   "futH": 99.0
+  },
+  {
+   "code": 105,
+   "store": "SJK河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "1619",
+   "name": "安井尚人",
+   "ovSec": 3000,
+   "ov": "0:50",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 248400,
+   "futH": 69.0
+  },
+  {
+   "code": 53,
+   "store": "四条河原町店",
+   "area": "京都・滋賀エリア",
+   "emp": "2537",
+   "name": "松葉隆也",
+   "ovSec": 2940,
+   "ov": "0:49",
+   "cnt": "1/6回",
+   "cntNum": 1,
+   "futSec": 234000,
+   "futH": 65.0
+  },
+  {
+   "code": 104,
+   "store": "河原町本店",
+   "area": "京都・滋賀エリア",
+   "emp": "2536",
+   "name": "岡林生恵",
+   "ovSec": 900,
+   "ov": "0:15",
+   "cnt": "0/6回",
+   "cntNum": 0,
+   "futSec": 288000,
+   "futH": 80.0
+  }
+ ],
+ "sep": {
+  "start": "2026/09/01",
+  "end": "2026/09/30",
+  "label": "2026年9月",
+  "stores": [
+   {
+    "name": "洛北店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "四条河原町店",
+    "v": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "三条河原町店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "河原町本店",
+    "v": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "SJK河原町本店",
+    "v": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "山科駅前店",
+    "v": [
+     0,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0
+    ],
+    "total": 3
+   },
+   {
+    "name": "京都駅前店",
+    "v": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "同志社前店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "六地蔵店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "草津駅東口店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "桃山御陵前店",
+    "v": [
+     0,
+     1,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "京大BOX店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "石山駅直結店",
+    "v": [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "京都河原町近江屋店",
+    "v": [
+     1,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "E-HUB KYOTO店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "Night Out 木屋町店",
+    "v": [
+     1,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "total": 2
+   }
+  ],
+  "catTotals": [
+   2,
+   2,
+   6,
+   2,
+   4,
+   2,
+   0
+  ],
+  "grand": 18
+ },
+ "aug": {
+  "start": "2026/08/01",
+  "end": "2026/08/31",
+  "label": "2026年8月",
+  "stores": [
+   {
+    "name": "洛北店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "四条河原町店",
+    "v": [
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "三条河原町店",
+    "v": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     1,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "河原町本店",
+    "v": [
+     1,
+     0,
+     0,
+     1,
+     1,
+     1,
+     1
+    ],
+    "total": 5
+   },
+   {
+    "name": "SJK河原町本店",
+    "v": [
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "山科駅前店",
+    "v": [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "京都駅前店",
+    "v": [
+     0,
+     1,
+     1,
+     0,
+     1,
+     0,
+     0
+    ],
+    "total": 3
+   },
+   {
+    "name": "同志社前店",
+    "v": [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 1
+   },
+   {
+    "name": "六地蔵店",
+    "v": [
+     0,
+     0,
+     0,
+     1,
+     1,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "草津駅東口店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "桃山御陵前店",
+    "v": [
+     0,
+     2,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "total": 3
+   },
+   {
+    "name": "京大BOX店",
+    "v": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 0
+   },
+   {
+    "name": "石山駅直結店",
+    "v": [
+     0,
+     1,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "total": 2
+   },
+   {
+    "name": "京都河原町近江屋店",
+    "v": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     2,
+     0
+    ],
+    "total": 3
+   },
+   {
+    "name": "E-HUB KYOTO店",
+    "v": [
+     1,
+     0,
+     1,
+     0,
+     0,
+     1,
+     0
+    ],
+    "total": 3
+   },
+   {
+    "name": "Night Out 木屋町店",
+    "v": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     2,
+     0
+    ],
+    "total": 3
+   }
+  ],
+  "catTotals": [
+   4,
+   6,
+   5,
+   5,
+   3,
+   8,
+   1
+  ],
+  "grand": 32
+ },
+ "generated": "2026-10-04"
+};
+const CATS = DATA.cats;
+const S = {chouka:'ov', sep:'total', aug:'total', an:'total'};
+const AR = {asc:'▲', desc:'▼'};
+
+/* ---------- tabs ---------- */
+const TITLES = {
+  chouka:['超過（時間外労働）','「超過」シートに記録された店舗・従業員ごとの超過時間、超過回数、今後の労働時間を一覧します。'],
+  sep:['ご意見集計 — 2026年9月','「ご意見」シート AG3:AN23 の範囲（2026/09/01 – 09/30）を店舗×カテゴリで表示します。'],
+  aug:['ご意見集計 — 2026年8月','「ご意見」シート AG24:AN46 の範囲（2026/08/01 – 08/31）を店舗×カテゴリで表示します。'],
+  analysis:['分析レポート','9月と8月の2範囲を突き合わせ、カテゴリ構成・店舗別の増減・読み取れるポイントを整理します。']
+};
+document.querySelectorAll('#nav button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const v=b.dataset.view;
+    document.querySelectorAll('#nav button').forEach(x=>x.setAttribute('aria-selected', x===b));
+    document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active', s.id==='view-'+v));
+    document.getElementById('pg-title').textContent=TITLES[v][0];
+    document.getElementById('pg-desc').textContent=TITLES[v][1];
+    window.scrollTo({top:0,behavior:'instant'});
+  });
+});
+
+/* ---------- helpers ---------- */
+const hmColor = (n,max)=>{
+  if(!n) return 'transparent';
+  const t=Math.max(.16, n/max);
+  return `rgba(31,58,95,${(t*0.9).toFixed(3)})`;
+};
+const hmText = n=> n? '#fff':'#c2cad4';
+const sum=a=>a.reduce((x,y)=>x+y,0);
+
+/* ---------- 超過 ---------- */
+(function(){
+  const d=DATA.chouka;
+  const total=sum(d.map(x=>x.ovSec||0)), maxRow=d.reduce((a,b)=>(b.ovSec||0)>(a.ovSec||0)?b:a,d[0]);
+  const futRows=d.filter(x=>x.futSec!=null);
+  const maxFut=futRows.reduce((a,b)=>b.futSec>a.futSec?b:a,futRows[0]);
+  const maxOv=Math.max(...d.map(x=>x.ovSec||0));
+  document.getElementById('ck-kpis').innerHTML=`
+    ${kpi('対象従業員','21','名','「超過」シート 11〜31 行の21名','')}
+    ${kpi('超過時間 合計',(total/3600).toFixed(1),'h','21名の合計','accent')}
+    ${kpi('最大 超過時間',fmtSec(maxRow.ovSec),'',''+maxRow.name+'（'+ (maxRow.store||'—') +'）','accent')}
+    ${kpi('今後の労働時間 最大',(maxFut.futH).toFixed(1),'h',''+maxFut.name+'（'+ (maxFut.store||'—') +'）','')}
+  `;
+  function fmtSec(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);return h+':'+String(m).padStart(2,'0');}
+  const body=document.getElementById('ck-body');
+  const search=document.getElementById('ck-search'), sortSel=document.getElementById('ck-sort');
+  let sortKey='ov', dir=-1;
+  function apply(){
+    let rows=d.slice();
+    const q=search.value.trim().toLowerCase();
+    if(q) rows=rows.filter(x=>(x.name+' '+(x.store||'')+' '+x.emp).toLowerCase().includes(q));
+    rows.sort((a,b)=>{
+      const av=a[sortKey], bv=b[sortKey];
+      if(typeof av==='string') return av.localeCompare(bv,'ja')*dir;
+      return ((av||0)-(bv||0))*dir;
+    });
+    const max=Math.max(...rows.map(x=>x.ovSec||0),1);
+    body.innerHTML=rows.map(x=>`
+      <tr>
+        <td class="code">${x.code??'—'}</td>
+        <td class="store-tag">${x.store??'—'}</td>
+        <td class="code">${x.emp}</td>
+        <td class="name">${x.name}</td>
+        <td class="r num" style="font-weight:600;color:${x.ovSec>=21600?'var(--shu)':'inherit'}">${x.ov}</td>
+        <td><div class="bar"><span style="width:${((x.ovSec||0)/max*100).toFixed(1)}%"></span></div></td>
+        <td class="c"><span class="pill ${x.cntNum>0?'warn':'mut'}">${x.cnt}</span></td>
+        <td class="r num">${x.futH!=null?x.futH.toFixed(1)+' h':'—'}</td>
+      </tr>`).join('') || `<tr><td colspan="8" style="padding:26px;text-align:center;color:var(--ink-2)">該当する従業員がいません</td></tr>`;
+  }
+  search.addEventListener('input',apply);
+  sortSel.addEventListener('change',()=>{
+    const map={ov:['ov',-1],ovAsc:['ov',1],cnt:['cntNum',-1],fut:['futSec',-1],code:['code',1]};
+    [sortKey,dir]=map[sortSel.value]; apply();
+  });
+  apply();
+})();
+function kpi(lb,vl,unit,fn,cls){return `<div class="kpi ${cls}"><div class="lb">${lb}</div><div class="vl">${vl}${unit?`<small>${unit}</small>`:''}</div><div class="fn">${fn||''}</div></div>`;}
+
+/* ---------- ご意見 ---------- */
+function renderFeedback(key, elId){
+  const b=DATA[key];
+  const maxCat=Math.max(...b.catTotals,1);
+  const maxCell=Math.max(...b.stores.flatMap(s=>s.v),1);
+  document.getElementById(elId+'-range').textContent = b.start+' ～ '+b.end;
+  document.getElementById(elId+'-kpis').innerHTML=`
+    ${kpi('総 ご意見 件数',b.grand,'件','対象16店舗の合計','accent')}
+    ${kpi('最多カテゴリ', CATS[b.catTotals.indexOf(Math.max(...b.catTotals))], '', '最多: '+Math.max(...b.catTotals)+' 件','')}
+    ${kpi('最多店舗', topStore(b).name,'',topStore(b).total+' 件','')}
+    ${kpi('ご意見ゼロの店舗', b.stores.filter(s=>s.total===0).length,'店','合計件数が0の店舗','')}
+  `;
+  const maxStoreTotal=Math.max(...b.stores.map(s=>s.total),1);
+  let html=`<thead><tr><th>店舗</th>${CATS.map(c=>`<th class="c">${c}</th>`).join('')}<th class="r">合計</th><th style="width:130px"></th></tr></thead><tbody>`;
+  b.stores.forEach(s=>{
+    const zero=s.total===0?'zero-row':'';
+    html+=`<tr class="${zero}"><td class="name">${s.name}</td>`+
+      s.v.map((n,i)=>`<td class="hm" style="background:${hmColor(n,maxCell)};color:${hmText(n)}">${n||''}</td>`).join('')+
+      `<td class="r num" style="font-weight:700">${s.total}</td>`+
+      `<td><div class="bar"><span style="width:${(s.total/maxStoreTotal*100).toFixed(1)}%"></span></div></td></tr>`;
+  });
+  html+=`</tbody><tfoot><tr><td>合計</td>`+
+    b.catTotals.map(n=>`<td class="r num">${n}</td>`).join('')+
+    `<td class="r num">${b.grand}</td><td></td></tr></tfoot>`;
+  document.getElementById(elId+'-table').innerHTML=html;
+  document.getElementById(elId+'-legend').innerHTML=
+    `<span><span class="sw" style="background:rgba(31,58,95,.9)"></span>濃いほど件数が多い</span>`+
+    CATS.map(c=>'').join('')+
+    `<span>『-』は分類なしの列です</span><span>行のハイライトは合計0件の店舗</span>`;
+}
+function topStore(b){return b.stores.reduce((a,s)=>s.total>a.total?s:a,b.stores[0]);}
+renderFeedback('sep','sep');
+renderFeedback('aug','aug');
+
+/* ---------- 分析 ---------- */
+(function(){
+  const a=DATA.aug, s=DATA.sep;
+  const diff=s.grand-a.grand;
+  const rate=(diff/a.grand*100);
+  document.getElementById('an-kpis').innerHTML=`
+    ${kpi('9月 総件数',s.grand,'件','2026/09/01 – 09/30','')}
+    ${kpi('8月 総件数',a.grand,'件','2026/08/01 – 08/31','')}
+    ${kpi('増減（9月−8月）',(diff>0?'+':'')+diff,'件',(diff>0?'増加':'減少')+' '+Math.abs(rate).toFixed(1)+'%','accent')}
+    ${kpi('カテゴリ最多(9月)',CATS[s.catTotals.indexOf(Math.max(...s.catTotals))],'',Math.max(...s.catTotals)+' 件','')}
+  `;
+  // categories
+  const order=CATS.map((c,i)=>({c,i})).sort((x,y)=>(s.catTotals[y.i]+a.catTotals[y.i])-(s.catTotals[x.i]+a.catTotals[x.i]));
+  const cmax=Math.max(...CATS.map((c,i)=>Math.max(s.catTotals[i],a.catTotals[i])),1);
+  document.getElementById('an-cats').innerHTML=order.map(({c,i})=>{
+    const d=s.catTotals[i]-a.catTotals[i];
+    const cls=d>0?'up':d<0?'down':'flat';
+    return `<div class="catrow">
+      <div class="cn">${c}</div>
+      <div class="dual">
+        <div class="b1"><span style="width:${(s.catTotals[i]/cmax*100).toFixed(1)}%"></span></div>
+        <div class="b2"><span style="width:${(a.catTotals[i]/cmax*100).toFixed(1)}%"></span></div>
+      </div>
+      <div class="v">9月 <b>${s.catTotals[i]}</b></div>
+      <div class="v">8月 <b>${a.catTotals[i]}</b></div>
+      <div class="delta ${cls}">${d>0?'+':''}${d}</div>
+    </div>`;
+  }).join('');
+  // points
+  const catUp=order.filter(({i})=>s.catTotals[i]>a.catTotals[i]).map(({c,i})=>`${c}（${a.catTotals[i]}→${s.catTotals[i]}件）`);
+  const catDown=order.filter(({i})=>s.catTotals[i]<a.catTotals[i]).map(({c,i})=>`${c}（${a.catTotals[i]}→${s.catTotals[i]}件）`);
+  const stDelta=s.stores.map((st,i)=>({name:st.name, S:st.total, A:a.stores[i]?a.stores[i].total:0}));
+  const upS=stDelta.filter(x=>x.S>x.A).sort((x,y)=>(y.S-y.A)-(x.S-x.A));
+  const downS=stDelta.filter(x=>x.S<x.A).sort((x,y)=>(x.S-x.A)-(y.S-y.A));
+  const zeroBoth=stDelta.filter(x=>x.S===0&&x.A===0);
+  const topS=topStore(s), topA=topStore(a);
+  const pts=[
+    `総件数は <em>8月 ${a.grand}件 → 9月 ${s.grand}件</em> と ${Math.abs(diff)}件（${Math.abs(rate).toFixed(1)}%）減少しました。`,
+    catDown.length?`減少が大きいカテゴリ: `+catDown.map(x=>`<em>${x.replace(/（.*/,'')}</em> ${x.match(/（(.*)）/)[1]}`).join('、')+`。`:'',
+    catUp.length?`逆に増えたのは `+catUp.map(x=>`<em>${x.replace(/（.*/,'')}</em> ${x.match(/（(.*)）/)[1]}`).join('、')+`。`:`カテゴリ別ではすべての項目で8月以下でした。`,
+    `9月の最多は <em>${topS.name}</em> の ${topS.total}件、8月の最多は <em>${topA.name}</em> の ${topA.total}件です。`,
+    upS.length?`前月より増えた店舗: <em>${upS.map(x=>x.name+' '+x.A+'→'+x.S).join('、')}</em>。`:``,
+    downS.length?`前月より減った店舗: <em>${downS.slice(0,6).map(x=>x.name+' '+x.A+'→'+x.S).join('、')}</em>${downS.length>6?' ほか':''}。`:``,
+    zeroBoth.length?`9月・8月ともご意見ゼロの店舗: <em>${zeroBoth.map(x=>x.name).join('、')}</em>（継続して良好）。`:`全店舗でいずれかの月にご意見があります。`
+  ].filter(Boolean);
+  document.getElementById('an-points').innerHTML=pts.map((p,i)=>`<li class="${i>0&&/減った|ゼロ|減少/.test(p)?'good':''}">${p}</li>`).join('');
+
+  // stores table
+  const rows=s.stores.map((st,i)=>({name:st.name, S:st.total, A:a.stores[i]?a.stores[i].total:0})).sort((x,y)=>(y.S+y.A)-(x.S+x.A)||x.name.localeCompare(y.name,'ja'));
+  const maxSt=Math.max(...rows.map(r=>Math.max(r.S,r.A)),1);
+  document.getElementById('an-stores').innerHTML=
+    `<thead><tr><th>店舗</th><th class="c">9月</th><th class="c">8月</th><th class="c">増減</th><th class="r">合計</th><th style="width:170px">9月 / 8月</th></tr></thead><tbody>`+
+    rows.map(r=>{
+      const d=r.S-r.A, cls=d>0?'up':d<0?'down':'flat';
+      return `<tr class="${r.S+r.A===0?'zero-row':''}"><td class="name">${r.name}</td>`+
+        `<td class="c num">${r.S}</td><td class="c num">${r.A}</td>`+
+        `<td class="c delta ${cls}">${d>0?'+':''}${d}</td>`+
+        `<td class="r num" style="font-weight:700">${r.S+r.A}</td>`+
+        `<td><div class="dual"><div class="b1"><span style="width:${(r.S/maxSt*100).toFixed(1)}%"></span></div><div class="b2"><span style="width:${(r.A/maxSt*100).toFixed(1)}%"></span></div></div></td></tr>`;
+    }).join('')+
+    `</tbody><tfoot><tr><td>合計</td><td class="c num">${s.grand}</td><td class="c num">${a.grand}</td><td class="c delta ${diff>0?'up':diff<0?'down':'flat'}">${diff>0?'+':''}${diff}</td><td class="r num">${s.grand+a.grand}</td><td></td></tr></tfoot>`;
+})();
+</script>
+</body>
+</html>
